@@ -20,7 +20,7 @@ Cuando clones el repositorio por primera vez:
 
 ```bash
 git clone <url-del-repo>
-cd snippet-service-2025
+cd permission-service-2025
 ./setup-hooks.sh
 ```
 
