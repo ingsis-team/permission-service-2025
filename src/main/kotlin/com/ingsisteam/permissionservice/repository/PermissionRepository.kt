@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Component
 import org.springframework.stereotype.Repository
 
-@Component
 @Repository
 interface PermissionRepository : JpaRepository<Permission, Long> {
     fun findBySnippetIdAndUserId(
