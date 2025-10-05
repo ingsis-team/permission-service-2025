@@ -4,7 +4,6 @@ import com.ingsisteam.permissionservice.model.entity.Permission
 import com.ingsisteam.permissionservice.model.enum.PermissionRole
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
-import org.springframework.stereotype.Component
 import org.springframework.stereotype.Repository
 
 @Repository
