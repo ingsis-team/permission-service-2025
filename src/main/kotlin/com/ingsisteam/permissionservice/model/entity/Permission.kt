@@ -1,15 +1,15 @@
 package com.ingsisteam.permissionservice.model.entity
 
 import com.ingsisteam.permissionservice.model.enum.PermissionRole
+import jakarta.persistence.Column
 import jakarta.persistence.Entity
-import jakarta.persistence.Table
-import jakarta.persistence.Id
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
-import jakarta.persistence.Column
-import jakarta.persistence.Enumerated
-import jakarta.persistence.EnumType
+import jakarta.persistence.Id
 import jakarta.persistence.PreUpdate
+import jakarta.persistence.Table
 import java.time.LocalDateTime
 
 @Entity

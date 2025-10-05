@@ -10,9 +10,9 @@ services:
     environment:
       DB_HOST: permission-db
       DB_PORT: 5432
-      DB_NAME: ${POSTGRES_DB:-permissiondb}
-      DB_USER: ${POSTGRES_USER:-permissionuser}
-      DB_PASSWORD: ${POSTGRES_PASSWORD:-permissionpass}
+      DB_NAME: ${POSTGRES_DB}
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
     depends_on:
       permission-db:
         condition: service_healthy
@@ -23,13 +23,13 @@ services:
     ports:
       - "5433:5432"
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-permissionuser}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-permissionpass}
-      POSTGRES_DB: ${POSTGRES_DB:-permissiondb}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - permission_postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-permissionuser} -d ${POSTGRES_DB:-permissiondb}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
