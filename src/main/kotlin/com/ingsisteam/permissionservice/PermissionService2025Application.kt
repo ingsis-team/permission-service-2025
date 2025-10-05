@@ -1,4 +1,4 @@
-package com.ingsis_team.permission_service_2025
+package com.ingsisteam.permissionservice
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
@@ -7,5 +7,5 @@ import org.springframework.boot.runApplication
 class PermissionService2025Application
 
 fun main(args: Array<String>) {
-	runApplication<PermissionService2025Application>(*args)
+    runApplication<com.ingsisteam.permissionservice.PermissionService2025Application>(*args)
 }
