@@ -28,5 +28,5 @@ COPY --from=builder /home/gradle/project/build/libs/*.jar app.jar
 
 # Cambiar al usuario sin privilegios
 USER spring
-EXPOSE 8082
+EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
