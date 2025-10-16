@@ -1,23 +1,23 @@
 version: '3.9'
 
 services:
-  permission-api:
+  api:
     container_name: permission-api
     build:
       context: .
     ports:
       - "8081:8080"
     environment:
-      DB_HOST: permission-db
-      DB_PORT: 5432
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
       DB_NAME: ${POSTGRES_DB}
       DB_USER: ${POSTGRES_USER}
       DB_PASSWORD: ${POSTGRES_PASSWORD}
     depends_on:
-      permission-db:
+      db:
         condition: service_healthy
 
-  permission-db:
+  db:
     container_name: permission-db
     image: postgres:17
     ports:
@@ -27,7 +27,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
-      - permission_postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
@@ -36,4 +36,4 @@ services:
       start_period: 30s
 
 volumes:
-  permission_postgres_data:
+  postgres_data:
