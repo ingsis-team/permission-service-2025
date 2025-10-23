@@ -2,32 +2,34 @@ version: '3.9'
 
 services:
   api:
-    container_name: permission-api
+    container_name: permission-api-${ENVIRONMENT}
+    image: ghcr.io/ingsis-team/permission-service-2025:${ENVIRONMENT}
     build:
       context: .
     ports:
-      - "8081:8080"
+      - "${API_PORT}:8080"
     environment:
-      DB_HOST: ${DB_HOST}
-      DB_PORT: ${DB_PORT}
       DB_NAME: ${POSTGRES_DB}
       DB_USER: ${POSTGRES_USER}
       DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
     depends_on:
       db:
         condition: service_healthy
 
   db:
-    container_name: permission-db
+    container_name: permission-db-${ENVIRONMENT}
     image: postgres:17
     ports:
-      - "5433:5432"
+      - "${DB_HOST_PORT}:5432"
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
