@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component
 
 @Component
 class StartupLogger {
-
     @EventListener(ApplicationReadyEvent::class)
     fun onApplicationReady() {
         println("\n" + "=".repeat(60))
@@ -16,4 +15,3 @@ class StartupLogger {
         println("=".repeat(60) + "\n")
     }
 }
-
