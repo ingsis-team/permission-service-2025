@@ -7,7 +7,7 @@ RUN gradle dependencies --no-daemon
 COPY src src
 RUN gradle bootJar --no-daemon
 
-FROM openjdk:21-slim
+FROM eclipse-temurin:21-jre
 
 RUN apt-get update && apt-get install -y --no-install-recommends postgresql-client \
     && rm -rf /var/lib/apt/lists/*
