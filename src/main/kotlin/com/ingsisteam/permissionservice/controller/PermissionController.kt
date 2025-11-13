@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -29,6 +30,8 @@ import org.springframework.web.bind.annotation.RestController
 class PermissionController(
     private val permissionService: PermissionService,
 ) {
+    private val logger = LoggerFactory.getLogger(PermissionController::class.java)
+
     @PostMapping
     @Operation(summary = "Crear permiso", description = "Crea un nuevo permiso para un snippet y usuario")
     @ApiResponses(
@@ -40,7 +43,13 @@ class PermissionController(
     fun createPermission(
         @Valid @RequestBody createPermissionDTO: CreatePermissionDTO,
     ): ResponseEntity<PermissionResponseDTO> {
+        logger.info(
+            "Creando permiso para snippet {} y usuario {}",
+            createPermissionDTO.snippetId,
+            createPermissionDTO.userId,
+        )
         val permission = permissionService.createPermission(createPermissionDTO)
+        logger.info("Permiso creado exitosamente con ID {}", permission.id)
         return ResponseEntity.status(HttpStatus.CREATED).body(permission)
     }
 
@@ -55,6 +64,7 @@ class PermissionController(
         @Parameter(description = "ID del snippet") @RequestParam snippetId: Long,
         @Parameter(description = "ID del usuario") @RequestParam userId: String,
     ): ResponseEntity<PermissionCheckResponseDTO> {
+        logger.debug("Verificando permiso para snippet {} y usuario {}", snippetId, userId)
         val result = permissionService.checkPermission(snippetId, userId)
         return ResponseEntity.ok(result)
     }
@@ -68,6 +78,7 @@ class PermissionController(
         @RequestParam snippetId: Long,
         @RequestParam userId: String,
     ): ResponseEntity<Boolean> {
+        logger.debug("Verificando permiso de escritura para snippet {} y usuario {}", snippetId, userId)
         val hasWritePermission = permissionService.hasWritePermission(snippetId, userId)
         return ResponseEntity.ok(hasWritePermission)
     }
@@ -77,6 +88,7 @@ class PermissionController(
     fun getPermissionsBySnippet(
         @PathVariable snippetId: Long,
     ): ResponseEntity<List<PermissionResponseDTO>> {
+        logger.debug("Obteniendo permisos para snippet {}", snippetId)
         val permissions = permissionService.getPermissionsBySnippet(snippetId)
         return ResponseEntity.ok(permissions)
     }
@@ -86,6 +98,7 @@ class PermissionController(
     fun getPermissionsByUser(
         @PathVariable userId: String,
     ): ResponseEntity<List<PermissionResponseDTO>> {
+        logger.debug("Obteniendo permisos para usuario {}", userId)
         val permissions = permissionService.getPermissionsByUser(userId)
         return ResponseEntity.ok(permissions)
     }
@@ -97,7 +110,14 @@ class PermissionController(
         @PathVariable userId: String,
         @Valid @RequestBody updatePermissionDTO: UpdatePermissionDTO,
     ): ResponseEntity<PermissionResponseDTO> {
+        logger.info(
+            "Actualizando permiso para snippet {} y usuario {} a rol {}",
+            snippetId,
+            userId,
+            updatePermissionDTO.role,
+        )
         val permission = permissionService.updatePermission(snippetId, userId, updatePermissionDTO)
+        logger.info("Permiso actualizado exitosamente")
         return ResponseEntity.ok(permission)
     }
 
@@ -107,7 +127,9 @@ class PermissionController(
         @PathVariable snippetId: Long,
         @PathVariable userId: String,
     ): ResponseEntity<Unit> {
+        logger.info("Eliminando permiso para snippet {} y usuario {}", snippetId, userId)
         permissionService.deletePermission(snippetId, userId)
+        logger.info("Permiso eliminado exitosamente")
         return ResponseEntity.noContent().build()
     }
 }

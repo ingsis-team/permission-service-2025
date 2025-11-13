@@ -1,5 +1,6 @@
 package com.ingsisteam.permissionservice.exception
 
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.FieldError
@@ -10,6 +11,8 @@ import java.time.LocalDateTime
 
 @RestControllerAdvice
 class GlobalExceptionHandler {
+    private val logger = LoggerFactory.getLogger(GlobalExceptionHandler::class.java)
+
     data class ErrorResponse(
         val timestamp: LocalDateTime = LocalDateTime.now(),
         val status: Int,
@@ -26,6 +29,7 @@ class GlobalExceptionHandler {
                 "$fieldName: $errorMessage"
             }
 
+        logger.warn("Error de validación: {}", errors)
         val errorResponse =
             ErrorResponse(
                 status = HttpStatus.BAD_REQUEST.value(),
@@ -37,6 +41,7 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException::class)
     fun handleIllegalArgumentException(ex: IllegalArgumentException): ResponseEntity<ErrorResponse> {
+        logger.warn("Argumento inválido: {}", ex.message)
         val errorResponse =
             ErrorResponse(
                 status = HttpStatus.BAD_REQUEST.value(),
@@ -48,6 +53,7 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(NoSuchElementException::class)
     fun handleNoSuchElementException(ex: NoSuchElementException): ResponseEntity<ErrorResponse> {
+        logger.warn("Recurso no encontrado: {}", ex.message)
         val errorResponse =
             ErrorResponse(
                 status = HttpStatus.NOT_FOUND.value(),
@@ -59,6 +65,7 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception::class)
     fun handleGenericException(ex: Exception): ResponseEntity<ErrorResponse> {
+        logger.error("Error inesperado", ex)
         val errorResponse =
             ErrorResponse(
                 status = HttpStatus.INTERNAL_SERVER_ERROR.value(),

@@ -16,6 +16,7 @@ services:
       db:
         condition: service_healthy
 
+
   db:
     container_name: permission-db-${ENVIRONMENT}
     image: postgres:17
