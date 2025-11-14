@@ -7,6 +7,7 @@ import com.ingsisteam.permissionservice.model.dto.UpdatePermissionDTO
 import com.ingsisteam.permissionservice.model.entity.Permission
 import com.ingsisteam.permissionservice.model.enum.PermissionRole
 import com.ingsisteam.permissionservice.repository.PermissionRepository
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -15,8 +16,14 @@ import org.springframework.transaction.annotation.Transactional
 class PermissionService(
     private val permissionRepository: PermissionRepository,
 ) {
+    private val logger = LoggerFactory.getLogger(PermissionService::class.java)
+
     fun createPermission(createPermissionDTO: CreatePermissionDTO): PermissionResponseDTO {
-        // Verificar si ya existe un permiso para esta combinación
+        logger.debug(
+            "Verificando si existe permiso para snippet {} y usuario {}",
+            createPermissionDTO.snippetId,
+            createPermissionDTO.userId,
+        )
         val existingPermission =
             permissionRepository.findBySnippetIdAndUserId(
                 createPermissionDTO.snippetId,
@@ -24,6 +31,11 @@ class PermissionService(
             )
 
         if (existingPermission != null) {
+            logger.warn(
+                "Intento de crear permiso duplicado para snippet {} y usuario {}",
+                createPermissionDTO.snippetId,
+                createPermissionDTO.userId,
+            )
             throw IllegalArgumentException(
                 "Permission already exists for snippet ${createPermissionDTO.snippetId} " +
                     "and user ${createPermissionDTO.userId}",
@@ -38,6 +50,13 @@ class PermissionService(
             )
 
         val savedPermission = permissionRepository.save(permission)
+        logger.info(
+            "Permiso creado: ID {}, Snippet {}, Usuario {}, Rol {}",
+            savedPermission.id,
+            savedPermission.snippetId,
+            savedPermission.userId,
+            savedPermission.role,
+        )
         return toResponseDTO(savedPermission)
     }
 
@@ -47,10 +66,19 @@ class PermissionService(
         userId: String,
     ): PermissionCheckResponseDTO {
         val permission = permissionRepository.findBySnippetIdAndUserId(snippetId, userId)
-        return PermissionCheckResponseDTO(
-            hasPermission = permission != null,
-            role = permission?.role,
+        val result =
+            PermissionCheckResponseDTO(
+                hasPermission = permission != null,
+                role = permission?.role,
+            )
+        logger.debug(
+            "Verificación de permiso: Snippet {}, Usuario {}, Tiene permiso: {}, Rol: {}",
+            snippetId,
+            userId,
+            result.hasPermission,
+            result.role,
         )
+        return result
     }
 
     @Transactional(readOnly = true)
@@ -64,19 +92,28 @@ class PermissionService(
                 userId,
                 listOf(PermissionRole.OWNER, PermissionRole.WRITE),
             )
-        return permission != null
+        val hasPermission = permission != null
+        logger.debug(
+            "Verificación de permiso de escritura: Snippet {}, Usuario {}, Resultado: {}",
+            snippetId,
+            userId,
+            hasPermission,
+        )
+        return hasPermission
     }
 
     @Transactional(readOnly = true)
     fun getPermissionsBySnippet(snippetId: Long): List<PermissionResponseDTO> {
-        return permissionRepository.findBySnippetId(snippetId)
-            .map { toResponseDTO(it) }
+        val permissions = permissionRepository.findBySnippetId(snippetId)
+        logger.debug("Obtenidos {} permisos para snippet {}", permissions.size, snippetId)
+        return permissions.map { toResponseDTO(it) }
     }
 
     @Transactional(readOnly = true)
     fun getPermissionsByUser(userId: String): List<PermissionResponseDTO> {
-        return permissionRepository.findByUserId(userId)
-            .map { toResponseDTO(it) }
+        val permissions = permissionRepository.findByUserId(userId)
+        logger.debug("Obtenidos {} permisos para usuario {}", permissions.size, userId)
+        return permissions.map { toResponseDTO(it) }
     }
 
     fun updatePermission(
@@ -86,10 +123,27 @@ class PermissionService(
     ): PermissionResponseDTO {
         val permission =
             permissionRepository.findBySnippetIdAndUserId(snippetId, userId)
-                ?: throw NoSuchElementException("Permission not found for snippet $snippetId and user $userId")
+                ?: run {
+                    logger.warn(
+                        "Intento de actualizar permiso inexistente para snippet {} y usuario {}",
+                        snippetId,
+                        userId,
+                    )
+                    throw NoSuchElementException(
+                        "Permission not found for snippet $snippetId and user $userId",
+                    )
+                }
 
+        val oldRole = permission.role
         permission.role = updatePermissionDTO.role
         val updatedPermission = permissionRepository.save(permission)
+        logger.info(
+            "Permiso actualizado: Snippet {}, Usuario {}, Rol anterior: {}, Rol nuevo: {}",
+            snippetId,
+            userId,
+            oldRole,
+            updatePermissionDTO.role,
+        )
         return toResponseDTO(updatedPermission)
     }
 
@@ -98,9 +152,11 @@ class PermissionService(
         userId: String,
     ) {
         if (!permissionRepository.existsBySnippetIdAndUserId(snippetId, userId)) {
+            logger.warn("Intento de eliminar permiso inexistente para snippet {} y usuario {}", snippetId, userId)
             throw NoSuchElementException("Permission not found for snippet $snippetId and user $userId")
         }
         permissionRepository.deleteBySnippetIdAndUserId(snippetId, userId)
+        logger.info("Permiso eliminado para snippet {} y usuario {}", snippetId, userId)
     }
 
     private fun toResponseDTO(permission: Permission): PermissionResponseDTO {
