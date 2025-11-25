@@ -14,6 +14,8 @@ class CorsConfig : WebMvcConfigurer {
                 "http://localhost:5173",
                 "http://localhost:5174",
                 "http://localhost:3000",
+                "http://snippet-prueba.duckdns.org",
+                "https://snippet-prueba.duckdns.org"
             )
             .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
             .allowedHeaders("*")
