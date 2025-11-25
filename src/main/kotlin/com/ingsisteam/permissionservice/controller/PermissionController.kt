@@ -61,7 +61,7 @@ class PermissionController(
         ],
     )
     fun checkPermission(
-        @Parameter(description = "ID del snippet") @RequestParam snippetId: Long,
+        @Parameter(description = "ID del snippet") @RequestParam snippetId: String,
         @Parameter(description = "ID del usuario") @RequestParam userId: String,
     ): ResponseEntity<PermissionCheckResponseDTO> {
         logger.debug("Verificando permiso para snippet {} y usuario {}", snippetId, userId)
@@ -75,7 +75,7 @@ class PermissionController(
         description = "Verifica si un usuario puede escribir en un snippet",
     )
     fun checkWritePermission(
-        @RequestParam snippetId: Long,
+        @RequestParam snippetId: String,
         @RequestParam userId: String,
     ): ResponseEntity<Boolean> {
         logger.debug("Verificando permiso de escritura para snippet {} y usuario {}", snippetId, userId)
@@ -86,7 +86,7 @@ class PermissionController(
     @GetMapping("/snippet/{snippetId}")
     @Operation(summary = "Obtener permisos por snippet", description = "Obtiene todos los permisos de un snippet")
     fun getPermissionsBySnippet(
-        @PathVariable snippetId: Long,
+        @PathVariable snippetId: String,
     ): ResponseEntity<List<PermissionResponseDTO>> {
         logger.debug("Obteniendo permisos para snippet {}", snippetId)
         val permissions = permissionService.getPermissionsBySnippet(snippetId)
@@ -106,7 +106,7 @@ class PermissionController(
     @PutMapping("/snippet/{snippetId}/user/{userId}")
     @Operation(summary = "Actualizar permiso", description = "Actualiza el rol de un permiso existente")
     fun updatePermission(
-        @PathVariable snippetId: Long,
+        @PathVariable snippetId: String,
         @PathVariable userId: String,
         @Valid @RequestBody updatePermissionDTO: UpdatePermissionDTO,
     ): ResponseEntity<PermissionResponseDTO> {
@@ -124,7 +124,7 @@ class PermissionController(
     @DeleteMapping("/snippet/{snippetId}/user/{userId}")
     @Operation(summary = "Eliminar permiso", description = "Elimina un permiso existente")
     fun deletePermission(
-        @PathVariable snippetId: Long,
+        @PathVariable snippetId: String,
         @PathVariable userId: String,
     ): ResponseEntity<Unit> {
         logger.info("Eliminando permiso para snippet {} y usuario {}", snippetId, userId)

@@ -7,30 +7,30 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 
 @Repository
-interface PermissionRepository : JpaRepository<Permission, Long> {
+interface PermissionRepository : JpaRepository<Permission, String> {
     fun findBySnippetIdAndUserId(
-        snippetId: Long,
+        snippetId: String,
         userId: String,
     ): Permission?
 
-    fun findBySnippetId(snippetId: Long): List<Permission>
+    fun findBySnippetId(snippetId: String): List<Permission>
 
     fun findByUserId(userId: String): List<Permission>
 
     fun existsBySnippetIdAndUserId(
-        snippetId: Long,
+        snippetId: String,
         userId: String,
     ): Boolean
 
     @Query("SELECT p FROM Permission p WHERE p.snippetId = :snippetId AND p.userId = :userId AND p.role IN :roles")
     fun findBySnippetIdAndUserIdAndRoleIn(
-        snippetId: Long,
+        snippetId: String,
         userId: String,
         roles: List<PermissionRole>,
     ): Permission?
 
     fun deleteBySnippetIdAndUserId(
-        snippetId: Long,
+        snippetId: String,
         userId: String,
     )
 }

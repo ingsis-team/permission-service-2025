@@ -62,7 +62,7 @@ class PermissionService(
 
     @Transactional(readOnly = true)
     fun checkPermission(
-        snippetId: Long,
+        snippetId: String,
         userId: String,
     ): PermissionCheckResponseDTO {
         val permission = permissionRepository.findBySnippetIdAndUserId(snippetId, userId)
@@ -83,7 +83,7 @@ class PermissionService(
 
     @Transactional(readOnly = true)
     fun hasWritePermission(
-        snippetId: Long,
+        snippetId: String,
         userId: String,
     ): Boolean {
         val permission =
@@ -103,7 +103,7 @@ class PermissionService(
     }
 
     @Transactional(readOnly = true)
-    fun getPermissionsBySnippet(snippetId: Long): List<PermissionResponseDTO> {
+    fun getPermissionsBySnippet(snippetId: String): List<PermissionResponseDTO> {
         val permissions = permissionRepository.findBySnippetId(snippetId)
         logger.debug("Obtenidos {} permisos para snippet {}", permissions.size, snippetId)
         return permissions.map { toResponseDTO(it) }
@@ -117,7 +117,7 @@ class PermissionService(
     }
 
     fun updatePermission(
-        snippetId: Long,
+        snippetId: String,
         userId: String,
         updatePermissionDTO: UpdatePermissionDTO,
     ): PermissionResponseDTO {
@@ -148,7 +148,7 @@ class PermissionService(
     }
 
     fun deletePermission(
-        snippetId: Long,
+        snippetId: String,
         userId: String,
     ) {
         if (!permissionRepository.existsBySnippetIdAndUserId(snippetId, userId)) {
