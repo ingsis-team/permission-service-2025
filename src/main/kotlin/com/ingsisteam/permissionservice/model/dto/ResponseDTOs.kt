@@ -4,8 +4,8 @@ import com.ingsisteam.permissionservice.model.enum.PermissionRole
 import java.time.LocalDateTime
 
 data class PermissionResponseDTO(
-    val id: Long,
-    val snippetId: Long,
+    val id: String,
+    val snippetId: String,
     val userId: String,
     val role: PermissionRole,
     val createdAt: LocalDateTime,

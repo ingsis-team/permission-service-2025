@@ -30,7 +30,7 @@ class PermissionServiceTest {
     fun `should create permission successfully`() {
         val createDTO =
             CreatePermissionDTO(
-                snippetId = 1L,
+                snippetId = "snippet1",
                 userId = "user1",
                 role = PermissionRole.OWNER,
             )
@@ -38,7 +38,7 @@ class PermissionServiceTest {
         val result = permissionService.createPermission(createDTO)
 
         assertNotNull(result)
-        assertEquals(1L, result.snippetId)
+        assertEquals("snippet1", result.snippetId)
         assertEquals("user1", result.userId)
         assertEquals(PermissionRole.OWNER, result.role)
     }
@@ -47,7 +47,7 @@ class PermissionServiceTest {
     fun `should throw exception when creating duplicate permission`() {
         val createDTO =
             CreatePermissionDTO(
-                snippetId = 1L,
+                snippetId = "snippet1",
                 userId = "user1",
                 role = PermissionRole.OWNER,
             )
@@ -63,14 +63,14 @@ class PermissionServiceTest {
     fun `should check permission correctly`() {
         val createDTO =
             CreatePermissionDTO(
-                snippetId = 1L,
+                snippetId = "snippet1",
                 userId = "user1",
                 role = PermissionRole.READ,
             )
 
         permissionService.createPermission(createDTO)
 
-        val result = permissionService.checkPermission(1L, "user1")
+        val result = permissionService.checkPermission("snippet1", "user1")
 
         assertTrue(result.hasPermission)
         assertEquals(PermissionRole.READ, result.role)
@@ -78,7 +78,7 @@ class PermissionServiceTest {
 
     @Test
     fun `should return false for non-existent permission`() {
-        val result = permissionService.checkPermission(999L, "nonexistent")
+        val result = permissionService.checkPermission("nonexistent", "nonexistent")
 
         assertFalse(result.hasPermission)
         assertNull(result.role)
@@ -88,19 +88,19 @@ class PermissionServiceTest {
     fun `should check write permission correctly`() {
         val ownerDTO =
             CreatePermissionDTO(
-                snippetId = 1L,
+                snippetId = "snippet1",
                 userId = "owner",
                 role = PermissionRole.OWNER,
             )
         val writeDTO =
             CreatePermissionDTO(
-                snippetId = 2L,
+                snippetId = "snippet2",
                 userId = "writer",
                 role = PermissionRole.WRITE,
             )
         val readDTO =
             CreatePermissionDTO(
-                snippetId = 3L,
+                snippetId = "snippet3",
                 userId = "reader",
                 role = PermissionRole.READ,
             )
@@ -109,16 +109,16 @@ class PermissionServiceTest {
         permissionService.createPermission(writeDTO)
         permissionService.createPermission(readDTO)
 
-        assertTrue(permissionService.hasWritePermission(1L, "owner"))
-        assertTrue(permissionService.hasWritePermission(2L, "writer"))
-        assertFalse(permissionService.hasWritePermission(3L, "reader"))
+        assertTrue(permissionService.hasWritePermission("snippet1", "owner"))
+        assertTrue(permissionService.hasWritePermission("snippet2", "writer"))
+        assertFalse(permissionService.hasWritePermission("snippet3", "reader"))
     }
 
     @Test
     fun `should update permission successfully`() {
         val createDTO =
             CreatePermissionDTO(
-                snippetId = 1L,
+                snippetId = "snippet1",
                 userId = "user1",
                 role = PermissionRole.READ,
             )
@@ -126,7 +126,7 @@ class PermissionServiceTest {
         permissionService.createPermission(createDTO)
 
         val updateDTO = UpdatePermissionDTO(role = PermissionRole.WRITE)
-        val result = permissionService.updatePermission(1L, "user1", updateDTO)
+        val result = permissionService.updatePermission("snippet1", "user1", updateDTO)
 
         assertEquals(PermissionRole.WRITE, result.role)
     }
@@ -136,7 +136,7 @@ class PermissionServiceTest {
         val updateDTO = UpdatePermissionDTO(role = PermissionRole.WRITE)
 
         assertThrows(NoSuchElementException::class.java) {
-            permissionService.updatePermission(999L, "nonexistent", updateDTO)
+            permissionService.updatePermission("nonexistent", "nonexistent", updateDTO)
         }
     }
 
@@ -144,22 +144,22 @@ class PermissionServiceTest {
     fun `should delete permission successfully`() {
         val createDTO =
             CreatePermissionDTO(
-                snippetId = 1L,
+                snippetId = "snippet1",
                 userId = "user1",
                 role = PermissionRole.READ,
             )
 
         permissionService.createPermission(createDTO)
-        assertTrue(permissionRepository.existsBySnippetIdAndUserId(1L, "user1"))
+        assertTrue(permissionRepository.existsBySnippetIdAndUserId("snippet1", "user1"))
 
-        permissionService.deletePermission(1L, "user1")
-        assertFalse(permissionRepository.existsBySnippetIdAndUserId(1L, "user1"))
+        permissionService.deletePermission("snippet1", "user1")
+        assertFalse(permissionRepository.existsBySnippetIdAndUserId("snippet1", "user1"))
     }
 
     @Test
     fun `should throw exception when deleting non-existent permission`() {
         assertThrows(NoSuchElementException::class.java) {
-            permissionService.deletePermission(999L, "nonexistent")
+            permissionService.deletePermission("nonexistent", "nonexistent")
         }
     }
 }

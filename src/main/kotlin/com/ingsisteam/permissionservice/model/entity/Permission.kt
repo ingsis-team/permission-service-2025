@@ -5,21 +5,21 @@ import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.PrePersist
 import jakarta.persistence.PreUpdate
 import jakarta.persistence.Table
 import java.time.LocalDateTime
+import java.util.UUID
 
 @Entity
 @Table(name = "permissions")
 data class Permission(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
+    @Column(length = 36)
+    var id: String = "",
     @Column(name = "snippet_id", nullable = false)
-    val snippetId: Long,
+    val snippetId: String,
     @Column(name = "user_id", nullable = false)
     val userId: String,
     @Enumerated(EnumType.STRING)
@@ -31,10 +31,18 @@ data class Permission(
     var updatedAt: LocalDateTime = LocalDateTime.now(),
 ) {
     constructor() : this(
-        snippetId = 0L,
+        id = "",
+        snippetId = "",
         userId = "",
         role = PermissionRole.READ,
     )
+
+    @PrePersist
+    fun generateId() {
+        if (id.isEmpty()) {
+            id = UUID.randomUUID().toString()
+        }
+    }
 
     @PreUpdate
     fun onUpdate() {
