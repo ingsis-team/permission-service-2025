@@ -1,15 +1,15 @@
-name: CD Pipeline
+name: CD Pipeline Prod
 
 on:
   push:
-    branches: [ main, dev ]
+    branches: [ main ]
 
 permissions:
   contents: read
   packages: write
 
 env:
-  IMAGE_NAME: ghcr.io/ingsis-team/permission-service-2025
+  IMAGE_NAME: ghcr.io/ingsis-team/permission-service-2025-prod
 
 jobs:
   publish_to_registry:
@@ -53,3 +53,17 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+      - name: refresh container
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST_PROD }}
+          username: ${{ secrets.SSH_USERNAME_PROD }}
+          key: ${{ secrets.SSH_KEY_PROD }}
+          script: |
+            cd infra-microservices-2025
+            # Actualizar imagen y reiniciar servicio
+            docker compose pull permission-service
+            docker compose up -d --force-recreate permission-service
+            # Reiniciar proxy para aplicar cambios
+            docker compose restart proxy
