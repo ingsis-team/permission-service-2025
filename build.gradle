@@ -5,6 +5,7 @@ plugins {
 	id 'org.springframework.boot' version '3.5.6'
 	id 'io.spring.dependency-management' version '1.1.7'
 	id 'org.jlleitschuh.gradle.ktlint' version '12.1.0'
+	id 'jacoco'
 }
 
 group = 'com.ingsis-team'
@@ -26,6 +27,17 @@ ktlint {
 		exclude("**/generated/**")
 	}
 	disabledRules = ["standard:package-name"]
+	version = "0.50.0"
+	outputToConsole = true
+	coloredOutput = true
+	reporters {
+		reporter "checkstyle"
+		reporter "json"
+	}
+}
+
+jacoco {
+    toolVersion = "0.8.11"
 }
 
 dependencies {
@@ -62,4 +74,79 @@ kotlin {
 
 tasks.named('test') {
 	useJUnitPlatform()
+	finalizedBy('jacocoTestReport') // Ensure JaCoCo report is generated after tests
+}
+
+jacoco {
+    toolVersion = "0.8.11"
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+    reports {
+        xml.required.set(false)
+        csv.required.set(false)
+        html.required.set(false)
+    }
+	classDirectories.setFrom(
+		files(
+			fileTree(
+				dir: "${buildDir}/classes/kotlin/main",
+				excludes: [
+					'**/*Application*',
+					'**/*DTO*',
+					'**/*Test*',
+					'**/*Config*',
+					'**/*Connector*',
+					'**/*Controller*',
+					'**/*Exception*',
+					'**/*Repository*',
+					'**/*Security*',
+					'**/*Service*',
+					'**/*Util*',
+					'**/*Enum*',
+					'**/*Model*',
+					'**/*Entity*'
+				]
+			)
+		)
+	)
+}
+
+tasks.jacocoTestCoverageVerification {
+    dependsOn(tasks.jacocoTestReport)
+    violationRules {
+        rule {
+            limit {
+                minimum = "0.80".toBigDecimal()
+            }
+        }
+    }
+	classDirectories.setFrom(
+		files(
+			fileTree(
+				dir: "${buildDir}/classes/kotlin/main",
+				excludes: [
+					'**/*Application*',
+					'**/*DTO*',
+					'**/*Test*',
+					'**/*Config*',
+					'**/*Connector*',
+					'**/*Controller*',
+					'**/*Exception*',
+					'**/*Repository*',
+					'**/*Security*',
+					'**/*Service*',
+					'**/*Util*',
+					'**/*Enum*',
+					'**/*Model*',
+					'**/*Entity*'
+				]
+			)
+		)
+	)
+}
+
+tasks.check {
+    dependsOn(tasks.jacocoTestCoverageVerification)
 }
