@@ -64,6 +64,9 @@ dependencies {
 
     // Environment variable management
     implementation 'me.paulschwarz:spring-dotenv:4.0.0'
+
+    // New Relic
+    implementation 'com.newrelic.agent.java:newrelic-api:8.15.0'
 }
 
 kotlin {
