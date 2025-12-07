@@ -1,5 +1,6 @@
 package com.ingsisteam.permissionservice.config
 
+import com.newrelic.api.agent.NewRelic
 import jakarta.servlet.Filter
 import jakarta.servlet.FilterChain
 import jakarta.servlet.ServletRequest
@@ -54,6 +55,9 @@ class RequestIdFilter : Filter {
             )
 
             chain.doFilter(request, response)
+
+            // Agregar atributo personalizado a NewRelic
+            NewRelic.addCustomParameter("requestId", requestId)
 
             logger.info(
                 "Request completed: {} {} - Status: {}\n",
