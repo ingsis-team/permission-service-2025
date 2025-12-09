@@ -62,3 +62,22 @@ Environment variables (configured in `docker-compose.yml`):
 - `DB_USER`: PostgreSQL user
 - `DB_PASSWORD`: PostgreSQL password
 
+## Integration
+
+This service is used by:
+- **Snippet Service**: Checks permissions before allowing snippet operations
+- **Asset Service**: May check permissions for asset access
+
+## Docker Build
+
+The Dockerfile uses a multi-stage build:
+1. **Builder stage**: Builds the JAR using Gradle
+2. **Runtime stage**: Creates a lightweight runtime image with the JAR
+
+## Development Notes
+
+- Uses JWT authentication via Auth0
+- CORS is configured for cross-origin requests
+- Includes comprehensive error handling
+- Supports ktlint for code quality
+
